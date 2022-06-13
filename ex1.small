@@ -1,1 +1,9 @@
-volatile int item;
+
+
+
+int z = 12; 
+
+
+volatile int m = 124; 
+
+

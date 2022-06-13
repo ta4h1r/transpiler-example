@@ -39,28 +39,28 @@ var_declare
 
 
 var_assign
-    -> %var_type:+ _ %identifier _ "=" _ expr _ %EL
-        {%
-            (data) => {
-                // console.log(data)
-                return {
-                    type: "var_assign",
-                    value: data[2]
-                    //var_name: data[0],
+    -> (%var_type _):+ %identifier _ "=" _ expr _ %EL
+            {%
+                (data) => {
+                    return {
+                        type: "var_assign",
+                        var_types: data[0].map(x => x[0]),
+                        var_name: data[1],
+                        value: data[5]
+                    }
                 }
-            }
-        %}
+            %}
         | %identifier _ "=" _ expr _ %EL
-        {%
-            (data) => {
-                // console.log(data)
-                return {
-                    type: "var_assign",
-                    var_name: data[0],
-                    //value: data[4]
+            {%
+                (data) => {
+                    // console.log(data)
+                    return {
+                        type: "var_assign",
+                        var_name: data[0],
+                        value: data[4]
+                    }
                 }
-            }
-        %}
+            %}
 
 
 

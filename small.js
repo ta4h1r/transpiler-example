@@ -31,28 +31,30 @@ var grammar = {
             }
         }
                 },
-    {"name": "var_assign$ebnf$1", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type)]},
-    {"name": "var_assign$ebnf$1", "symbols": ["var_assign$ebnf$1", (myLexer.has("var_type") ? {type: "var_type"} : var_type)], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "var_assign", "symbols": ["var_assign$ebnf$1", "_", (myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"="}, "_", "expr", "_", (myLexer.has("EL") ? {type: "EL"} : EL)], "postprocess": 
+    {"name": "var_assign$ebnf$1$subexpression$1", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type), "_"]},
+    {"name": "var_assign$ebnf$1", "symbols": ["var_assign$ebnf$1$subexpression$1"]},
+    {"name": "var_assign$ebnf$1$subexpression$2", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type), "_"]},
+    {"name": "var_assign$ebnf$1", "symbols": ["var_assign$ebnf$1", "var_assign$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "var_assign", "symbols": ["var_assign$ebnf$1", (myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"="}, "_", "expr", "_", (myLexer.has("EL") ? {type: "EL"} : EL)], "postprocess": 
         (data) => {
-            // console.log(data)
             return {
                 type: "var_assign",
-                value: data[2]
-                //var_name: data[0],
+                var_types: data[0].map(x => x[0]),
+                var_name: data[1],
+                value: data[5]
             }
         }
-                },
+                    },
     {"name": "var_assign", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"="}, "_", "expr", "_", (myLexer.has("EL") ? {type: "EL"} : EL)], "postprocess": 
         (data) => {
             // console.log(data)
             return {
                 type: "var_assign",
                 var_name: data[0],
-                //value: data[4]
+                value: data[4]
             }
         }
-                },
+                    },
     {"name": "expr", "symbols": [(myLexer.has("string") ? {type: "string"} : string)], "postprocess": id},
     {"name": "expr", "symbols": [(myLexer.has("number") ? {type: "number"} : number)], "postprocess": id},
     {"name": "expr", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier)], "postprocess": id},

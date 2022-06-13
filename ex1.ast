@@ -174,13 +174,57 @@
           }
         },
         {
+          "type": "fun_call",
+          "fun_name": {
+            "type": "identifier",
+            "value": "moveLeft",
+            "text": "moveLeft",
+            "offset": 118,
+            "lineBreaks": 0,
+            "line": 10,
+            "col": 5
+          },
+          "arguments": {
+            "type": "arg_list",
+            "arg_values": [
+              {
+                "type": "number",
+                "value": "10",
+                "text": "10",
+                "offset": 127,
+                "lineBreaks": 0,
+                "line": 10,
+                "col": 14
+              },
+              {
+                "type": "char",
+                "value": "'T'",
+                "text": "'T'",
+                "offset": 131,
+                "lineBreaks": 0,
+                "line": 10,
+                "col": 18
+              },
+              {
+                "type": "string",
+                "value": "\"HELLO\"",
+                "text": "\"HELLO\"",
+                "offset": 136,
+                "lineBreaks": 0,
+                "line": 10,
+                "col": 23
+              }
+            ]
+          }
+        },
+        {
           "type": "var_declare",
           "var_types": [
             {
               "type": "var_type",
               "value": "volatile",
               "text": "volatile",
-              "offset": 121,
+              "offset": 153,
               "lineBreaks": 0,
               "line": 13,
               "col": 5
@@ -189,7 +233,7 @@
               "type": "var_type",
               "value": "int",
               "text": "int",
-              "offset": 130,
+              "offset": 162,
               "lineBreaks": 0,
               "line": 13,
               "col": 14
@@ -199,7 +243,7 @@
             "type": "identifier",
             "value": "bad",
             "text": "bad",
-            "offset": 134,
+            "offset": 166,
             "lineBreaks": 0,
             "line": 13,
             "col": 18

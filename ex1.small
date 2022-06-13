@@ -7,7 +7,7 @@ volatile int wayase = 2309184;
 void method(int a, string b) {
     int i = 0; 
 
-
+    moveLeft(10, 'T', "HELLO"); 
 
 
     volatile int bad;

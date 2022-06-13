@@ -17,12 +17,11 @@ statements
             }
         %}
 
-
 statement
     -> var_declare  {% id %}
     | var_assign    {% id %}
-    | method    {% id %}
-
+    | method        {% id %}
+    | fun_call        {% id %}
 
 var_declare
     -> (%var_type _):+ %identifier _ %EL
@@ -35,7 +34,6 @@ var_declare
                 }
             }
         %}
-
 
 var_assign
     -> (%var_type _):+ %identifier _ "=" _ expr _ %EL
@@ -59,7 +57,6 @@ var_assign
                     }
                 }
             %}
-
 
 expr
     -> %string     {% id %}
@@ -89,7 +86,6 @@ method
             }
         %}
 
-
 fun_signature
     -> %var_type _ %identifier _ "(" fun_params ")" _ml "{"
         {%
@@ -103,7 +99,6 @@ fun_signature
             }
         %}
 
-
 fun_body
     -> statements "}"
         {%
@@ -115,7 +110,6 @@ fun_body
             }
         %}
 
-    
 fun_params
     -> (_ml %comma:? _ %var_type __ %identifier):*
         {%
@@ -128,21 +122,28 @@ fun_params
             }
         %}
 
+fun_call
+    -> %identifier _ "(" arg_list ")" %EL
+        {%
+            (data) => {
+                return {
+                    type: "fun_call",
+                    fun_name: data[0],
+                    arguments: data[3]
+                }
+            }
+        %}
 
-
-
-# fun_call
-#     -> _ %identifier _ "(" _ (param_list _):? ")" %EL
-#         {%
-#             (data) => {
-#                 return {
-#                     type: "fun_call",
-#                     fun_name: data[0],
-#                     arguments: data[4] ? data[4][0] : []
-#                 }
-#             }
-#         %}
-
+arg_list 
+    -> (_ml expr _ml %comma:?):*
+        {%
+            (data) => {
+                return {
+                    type: "arg_list",
+                    arg_values: data[0].map(x => x[1])
+                }
+            }
+        %}
 
 
 

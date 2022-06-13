@@ -18,6 +18,7 @@ var grammar = {
     {"name": "statement", "symbols": ["var_declare"], "postprocess": id},
     {"name": "statement", "symbols": ["var_assign"], "postprocess": id},
     {"name": "statement", "symbols": ["method"], "postprocess": id},
+    {"name": "statement", "symbols": ["fun_call"], "postprocess": id},
     {"name": "var_declare$ebnf$1$subexpression$1", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type), "_"]},
     {"name": "var_declare$ebnf$1", "symbols": ["var_declare$ebnf$1$subexpression$1"]},
     {"name": "var_declare$ebnf$1$subexpression$2", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type), "_"]},
@@ -96,6 +97,28 @@ var grammar = {
                 type: "fun_params",
                 param_types: data[0].map(x => x[3]),
                 param_values: data[0].map(x => x[5])
+            }
+        }
+                },
+    {"name": "fun_call", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"("}, "arg_list", {"literal":")"}, (myLexer.has("EL") ? {type: "EL"} : EL)], "postprocess": 
+        (data) => {
+            return {
+                type: "fun_call",
+                fun_name: data[0],
+                arguments: data[3]
+            }
+        }
+                },
+    {"name": "arg_list$ebnf$1", "symbols": []},
+    {"name": "arg_list$ebnf$1$subexpression$1$ebnf$1", "symbols": [(myLexer.has("comma") ? {type: "comma"} : comma)], "postprocess": id},
+    {"name": "arg_list$ebnf$1$subexpression$1$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "arg_list$ebnf$1$subexpression$1", "symbols": ["_ml", "expr", "_ml", "arg_list$ebnf$1$subexpression$1$ebnf$1"]},
+    {"name": "arg_list$ebnf$1", "symbols": ["arg_list$ebnf$1", "arg_list$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "arg_list", "symbols": ["arg_list$ebnf$1"], "postprocess": 
+        (data) => {
+            return {
+                type: "arg_list",
+                arg_values: data[0].map(x => x[1])
             }
         }
                 },

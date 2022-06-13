@@ -1,0 +1,34 @@
+[
+  {
+    "type": "var_declare",
+    "var_types": [
+      {
+        "type": "var_type",
+        "value": "volatile",
+        "text": "volatile",
+        "offset": 0,
+        "lineBreaks": 0,
+        "line": 1,
+        "col": 1
+      },
+      {
+        "type": "var_type",
+        "value": "int",
+        "text": "int",
+        "offset": 9,
+        "lineBreaks": 0,
+        "line": 1,
+        "col": 10
+      }
+    ],
+    "var_name": {
+      "type": "identifier",
+      "value": "item",
+      "text": "item",
+      "offset": 13,
+      "lineBreaks": 0,
+      "line": 1,
+      "col": 14
+    }
+  }
+]

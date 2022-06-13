@@ -79,7 +79,10 @@ var grammar = {
                 },
     {"name": "fun_body", "symbols": ["statements", {"literal":"}"}], "postprocess": 
         (data) => {
-            return data[0];
+            return {
+                type: "fun_body", 
+                statements: data[0], 
+            };
         }
                 },
     {"name": "fun_params$ebnf$1", "symbols": []},

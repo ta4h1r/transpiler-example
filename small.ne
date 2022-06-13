@@ -108,7 +108,10 @@ fun_body
     -> statements "}"
         {%
             (data) => {
-                return data[0];
+                return {
+                    type: "fun_body", 
+                    statements: data[0], 
+                };
             }
         %}
 

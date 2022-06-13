@@ -138,71 +138,74 @@
         "col": 1
       }
     },
-    "body": [
-      {
-        "type": "var_assign",
-        "var_types": [
-          {
-            "type": "var_type",
-            "value": "int",
-            "text": "int",
-            "offset": 101,
+    "body": {
+      "type": "fun_body",
+      "statements": [
+        {
+          "type": "var_assign",
+          "var_types": [
+            {
+              "type": "var_type",
+              "value": "int",
+              "text": "int",
+              "offset": 101,
+              "lineBreaks": 0,
+              "line": 8,
+              "col": 5
+            }
+          ],
+          "var_name": {
+            "type": "identifier",
+            "value": "i",
+            "text": "i",
+            "offset": 105,
             "lineBreaks": 0,
             "line": 8,
-            "col": 5
-          }
-        ],
-        "var_name": {
-          "type": "identifier",
-          "value": "i",
-          "text": "i",
-          "offset": 105,
-          "lineBreaks": 0,
-          "line": 8,
-          "col": 9
-        },
-        "value": {
-          "type": "number",
-          "value": "0",
-          "text": "0",
-          "offset": 109,
-          "lineBreaks": 0,
-          "line": 8,
-          "col": 13
-        }
-      },
-      {
-        "type": "var_declare",
-        "var_types": [
-          {
-            "type": "var_type",
-            "value": "volatile",
-            "text": "volatile",
-            "offset": 121,
-            "lineBreaks": 0,
-            "line": 13,
-            "col": 5
+            "col": 9
           },
-          {
-            "type": "var_type",
-            "value": "int",
-            "text": "int",
-            "offset": 130,
+          "value": {
+            "type": "number",
+            "value": "0",
+            "text": "0",
+            "offset": 109,
+            "lineBreaks": 0,
+            "line": 8,
+            "col": 13
+          }
+        },
+        {
+          "type": "var_declare",
+          "var_types": [
+            {
+              "type": "var_type",
+              "value": "volatile",
+              "text": "volatile",
+              "offset": 121,
+              "lineBreaks": 0,
+              "line": 13,
+              "col": 5
+            },
+            {
+              "type": "var_type",
+              "value": "int",
+              "text": "int",
+              "offset": 130,
+              "lineBreaks": 0,
+              "line": 13,
+              "col": 14
+            }
+          ],
+          "var_name": {
+            "type": "identifier",
+            "value": "bad",
+            "text": "bad",
+            "offset": 134,
             "lineBreaks": 0,
             "line": 13,
-            "col": 14
+            "col": 18
           }
-        ],
-        "var_name": {
-          "type": "identifier",
-          "value": "bad",
-          "text": "bad",
-          "offset": 134,
-          "lineBreaks": 0,
-          "line": 13,
-          "col": 18
         }
-      }
-    ]
+      ]
+    }
   }
 ]

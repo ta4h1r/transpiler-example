@@ -17,13 +17,13 @@ var grammar = {
                 },
     {"name": "statement", "symbols": ["var_declare"], "postprocess": id},
     {"name": "statement", "symbols": ["var_assign"], "postprocess": id},
+    {"name": "statement", "symbols": ["method"], "postprocess": id},
     {"name": "var_declare$ebnf$1$subexpression$1", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type), "_"]},
     {"name": "var_declare$ebnf$1", "symbols": ["var_declare$ebnf$1$subexpression$1"]},
     {"name": "var_declare$ebnf$1$subexpression$2", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type), "_"]},
     {"name": "var_declare$ebnf$1", "symbols": ["var_declare$ebnf$1", "var_declare$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "var_declare", "symbols": ["var_declare$ebnf$1", (myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", (myLexer.has("EL") ? {type: "EL"} : EL)], "postprocess": 
         (data) => {
-            console.log(data)
             return {
                 type: "var_declare",
                 var_types: data[0].map(item => item[0]),
@@ -47,7 +47,6 @@ var grammar = {
                     },
     {"name": "var_assign", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"="}, "_", "expr", "_", (myLexer.has("EL") ? {type: "EL"} : EL)], "postprocess": 
         (data) => {
-            // console.log(data)
             return {
                 type: "var_assign",
                 var_name: data[0],
@@ -59,14 +58,42 @@ var grammar = {
     {"name": "expr", "symbols": [(myLexer.has("char") ? {type: "char"} : char)], "postprocess": id},
     {"name": "expr", "symbols": [(myLexer.has("number") ? {type: "number"} : number)], "postprocess": id},
     {"name": "expr", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier)], "postprocess": id},
-    {"name": "param_list$ebnf$1", "symbols": []},
-    {"name": "param_list$ebnf$1$subexpression$1", "symbols": ["__", (myLexer.has("identifier") ? {type: "identifier"} : identifier)]},
-    {"name": "param_list$ebnf$1", "symbols": ["param_list$ebnf$1", "param_list$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "param_list", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), "param_list$ebnf$1"], "postprocess": 
+    {"name": "method", "symbols": ["fun_signature", "fun_body"], "postprocess": 
         (data) => {
-            const repeatedPieces = data[1];
-            const restParams = repeatedPieces.map(piece => piece[1]);
-            return [data[0], ...restParams];
+            return {
+                type: "method",
+                signature: data[0],
+                body: data[1]
+            }
+        }
+                },
+    {"name": "fun_signature", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type), "_", (myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"("}, "fun_params", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+        (data) => {
+            return {
+                type: "fun_signature",
+                name: data[2],
+                params: data[5], 
+                returns: data[0]
+            }
+        }
+                },
+    {"name": "fun_body", "symbols": ["statements", {"literal":"}"}], "postprocess": 
+        (data) => {
+            return data[0];
+        }
+                },
+    {"name": "fun_params$ebnf$1", "symbols": []},
+    {"name": "fun_params$ebnf$1$subexpression$1$ebnf$1", "symbols": [(myLexer.has("comma") ? {type: "comma"} : comma)], "postprocess": id},
+    {"name": "fun_params$ebnf$1$subexpression$1$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "fun_params$ebnf$1$subexpression$1", "symbols": ["_ml", "fun_params$ebnf$1$subexpression$1$ebnf$1", "_", (myLexer.has("var_type") ? {type: "var_type"} : var_type), "__", (myLexer.has("identifier") ? {type: "identifier"} : identifier)]},
+    {"name": "fun_params$ebnf$1", "symbols": ["fun_params$ebnf$1", "fun_params$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "fun_params", "symbols": ["fun_params$ebnf$1"], "postprocess": 
+        (data) => {
+            return {
+                type: "fun_params",
+                param_types: data[0].map(x => x[3]),
+                param_values: data[0].map(x => x[5])
+            }
         }
                 },
     {"name": "__lb_$ebnf$1$subexpression$1", "symbols": ["_", (myLexer.has("NL") ? {type: "NL"} : NL)]},

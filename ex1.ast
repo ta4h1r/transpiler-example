@@ -1,6 +1,6 @@
 [
   {
-    "type": "var_declare",
+    "type": "var_assign",
     "var_types": [
       {
         "type": "var_type",
@@ -23,99 +23,21 @@
     ],
     "var_name": {
       "type": "identifier",
-      "value": "wagyu",
-      "text": "wagyu",
+      "value": "wayase",
+      "text": "wayase",
       "offset": 14,
       "lineBreaks": 0,
       "line": 2,
       "col": 14
-    }
-  },
-  {
-    "type": "var_declare",
-    "var_types": [
-      {
-        "type": "var_type",
-        "value": "int",
-        "text": "int",
-        "offset": 22,
-        "lineBreaks": 0,
-        "line": 3,
-        "col": 1
-      }
-    ],
-    "var_name": {
-      "type": "identifier",
-      "value": "cow",
-      "text": "cow",
-      "offset": 26,
-      "lineBreaks": 0,
-      "line": 3,
-      "col": 5
-    }
-  },
-  {
-    "type": "var_assign",
-    "var_types": [
-      {
-        "type": "var_type",
-        "value": "int",
-        "text": "int",
-        "offset": 32,
-        "lineBreaks": 0,
-        "line": 4,
-        "col": 1
-      }
-    ],
-    "var_name": {
-      "type": "identifier",
-      "value": "z",
-      "text": "z",
-      "offset": 36,
-      "lineBreaks": 0,
-      "line": 4,
-      "col": 5
     },
     "value": {
       "type": "number",
-      "value": "12",
-      "text": "12",
-      "offset": 40,
+      "value": "2309184",
+      "text": "2309184",
+      "offset": 23,
       "lineBreaks": 0,
-      "line": 4,
-      "col": 9
-    }
-  },
-  {
-    "type": "var_assign",
-    "var_types": [
-      {
-        "type": "var_type",
-        "value": "char",
-        "text": "char",
-        "offset": 45,
-        "lineBreaks": 0,
-        "line": 5,
-        "col": 1
-      }
-    ],
-    "var_name": {
-      "type": "identifier",
-      "value": "w",
-      "text": "w",
-      "offset": 50,
-      "lineBreaks": 0,
-      "line": 5,
-      "col": 6
-    },
-    "value": {
-      "type": "char",
-      "value": "'g'",
-      "text": "'g'",
-      "offset": 54,
-      "lineBreaks": 0,
-      "line": 5,
-      "col": 10
+      "line": 2,
+      "col": 23
     }
   },
   {
@@ -125,70 +47,162 @@
         "type": "var_type",
         "value": "string",
         "text": "string",
-        "offset": 60,
+        "offset": 42,
         "lineBreaks": 0,
-        "line": 6,
-        "col": 1
+        "line": 5,
+        "col": 5
       }
     ],
     "var_name": {
       "type": "identifier",
-      "value": "s",
-      "text": "s",
-      "offset": 67,
+      "value": "p",
+      "text": "p",
+      "offset": 49,
       "lineBreaks": 0,
-      "line": 6,
-      "col": 8
+      "line": 5,
+      "col": 12
     },
     "value": {
       "type": "string",
-      "value": "\"string\"",
-      "text": "\"string\"",
-      "offset": 71,
+      "value": "\"Taibaiu\"",
+      "text": "\"Taibaiu\"",
+      "offset": 53,
       "lineBreaks": 0,
-      "line": 6,
-      "col": 12
+      "line": 5,
+      "col": 16
     }
   },
   {
-    "type": "var_assign",
-    "var_types": [
-      {
+    "type": "method",
+    "signature": {
+      "type": "fun_signature",
+      "name": {
+        "type": "identifier",
+        "value": "method",
+        "text": "method",
+        "offset": 71,
+        "lineBreaks": 0,
+        "line": 7,
+        "col": 6
+      },
+      "params": {
+        "type": "fun_params",
+        "param_types": [
+          {
+            "type": "var_type",
+            "value": "int",
+            "text": "int",
+            "offset": 78,
+            "lineBreaks": 0,
+            "line": 7,
+            "col": 13
+          },
+          {
+            "type": "var_type",
+            "value": "string",
+            "text": "string",
+            "offset": 85,
+            "lineBreaks": 0,
+            "line": 7,
+            "col": 20
+          }
+        ],
+        "param_values": [
+          {
+            "type": "identifier",
+            "value": "a",
+            "text": "a",
+            "offset": 82,
+            "lineBreaks": 0,
+            "line": 7,
+            "col": 17
+          },
+          {
+            "type": "identifier",
+            "value": "b",
+            "text": "b",
+            "offset": 92,
+            "lineBreaks": 0,
+            "line": 7,
+            "col": 27
+          }
+        ]
+      },
+      "returns": {
         "type": "var_type",
-        "value": "volatile",
-        "text": "volatile",
-        "offset": 82,
+        "value": "void",
+        "text": "void",
+        "offset": 66,
         "lineBreaks": 0,
         "line": 7,
         "col": 1
+      }
+    },
+    "body": [
+      {
+        "type": "var_assign",
+        "var_types": [
+          {
+            "type": "var_type",
+            "value": "int",
+            "text": "int",
+            "offset": 101,
+            "lineBreaks": 0,
+            "line": 8,
+            "col": 5
+          }
+        ],
+        "var_name": {
+          "type": "identifier",
+          "value": "i",
+          "text": "i",
+          "offset": 105,
+          "lineBreaks": 0,
+          "line": 8,
+          "col": 9
+        },
+        "value": {
+          "type": "number",
+          "value": "0",
+          "text": "0",
+          "offset": 109,
+          "lineBreaks": 0,
+          "line": 8,
+          "col": 13
+        }
       },
       {
-        "type": "var_type",
-        "value": "int",
-        "text": "int",
-        "offset": 91,
-        "lineBreaks": 0,
-        "line": 7,
-        "col": 10
+        "type": "var_declare",
+        "var_types": [
+          {
+            "type": "var_type",
+            "value": "volatile",
+            "text": "volatile",
+            "offset": 121,
+            "lineBreaks": 0,
+            "line": 13,
+            "col": 5
+          },
+          {
+            "type": "var_type",
+            "value": "int",
+            "text": "int",
+            "offset": 130,
+            "lineBreaks": 0,
+            "line": 13,
+            "col": 14
+          }
+        ],
+        "var_name": {
+          "type": "identifier",
+          "value": "bad",
+          "text": "bad",
+          "offset": 134,
+          "lineBreaks": 0,
+          "line": 13,
+          "col": 18
+        }
       }
-    ],
-    "var_name": {
-      "type": "identifier",
-      "value": "m",
-      "text": "m",
-      "offset": 95,
-      "lineBreaks": 0,
-      "line": 7,
-      "col": 14
-    },
-    "value": {
-      "type": "number",
-      "value": "124",
-      "text": "124",
-      "offset": 99,
-      "lineBreaks": 0,
-      "line": 7,
-      "col": 18
-    }
+    ]
   }
 ]

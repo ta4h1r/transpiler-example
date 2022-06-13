@@ -1,9 +1,15 @@
 
-volatile int wagyu; 
-int cow; 
-int z = 12; 
-char w = 'g'; 
-string s = "string"; 
-volatile int m = 124; 
+volatile int wayase = 2309184;    
 
+
+    string p = "Taibaiu"; 
+
+void method(int a, string b) {
+    int i = 0; 
+
+
+
+
+    volatile int bad;
+}
 

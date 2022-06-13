@@ -21,14 +21,13 @@ statements
 statement
     -> var_declare  {% id %}
     | var_assign    {% id %}
-    # | fun_signature    {% id %}
+    | method    {% id %}
 
 
 var_declare
     -> (%var_type _):+ %identifier _ %EL
         {%
             (data) => {
-                console.log(data)
                 return {
                     type: "var_declare",
                     var_types: data[0].map(item => item[0]),
@@ -53,7 +52,6 @@ var_assign
         | %identifier _ "=" _ expr _ %EL
             {%
                 (data) => {
-                    // console.log(data)
                     return {
                         type: "var_assign",
                         var_name: data[0],
@@ -63,69 +61,69 @@ var_assign
             %}
 
 
-
 expr
     -> %string     {% id %}
-    |  %char     {% id %}
+    |  %char       {% id %}
     |  %number     {% id %}
     |  %identifier {% id %}
-    # |  fun_call    {% id %}
 
 
 
-    
-param_list
-    -> %identifier (__ %identifier):*
+
+
+
+
+
+
+
+
+method 
+    -> fun_signature fun_body
         {%
             (data) => {
-                const repeatedPieces = data[1];
-                const restParams = repeatedPieces.map(piece => piece[1]);
-                return [data[0], ...restParams];
+                return {
+                    type: "method",
+                    signature: data[0],
+                    body: data[1]
+                }
             }
         %}
 
 
+fun_signature
+    -> %var_type _ %identifier _ "(" fun_params ")" _ml "{"
+        {%
+            (data) => {
+                return {
+                    type: "fun_signature",
+                    name: data[2],
+                    params: data[5], 
+                    returns: data[0]
+                }
+            }
+        %}
 
 
+fun_body
+    -> statements "}"
+        {%
+            (data) => {
+                return data[0];
+            }
+        %}
 
-
-
-
-
-# fun_signature
-#     -> %var_type _ %identifier _ "(" _ (param_list _):* ")" _ %NL:* _ "{" _
-#         {%
-#             (data) => {
-#                 // console.log(data)
-#                 return {
-#                     type: "fun_signature",
-#                     name: data[2],
-#                     args: data[6], 
-#                     return: data[0]
-#                 }
-#             }
-#         %}
-
-
-# fun_body
-#     -> expr
-#         {%
-#             (data) => {
-#                 return [data[0]];
-#             }
-#         %}
-#     |  _ml statements __lb_ "}"
-#         {%
-#             (data) => {
-#                 return data[2];
-#             }
-#         %}
-
-
-
-
-
-
+    
+fun_params
+    -> (_ml %comma:? _ %var_type __ %identifier):*
+        {%
+            (data) => {
+                return {
+                    type: "fun_params",
+                    param_types: data[0].map(x => x[3]),
+                    param_values: data[0].map(x => x[5])
+                }
+            }
+        %}
 
 
 

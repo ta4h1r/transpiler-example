@@ -1,9 +1,9 @@
 
-
-
+volatile int wagyu; 
+int cow; 
 int z = 12; 
-
-
+char w = 'g'; 
+string s = "string"; 
 volatile int m = 124; 
 
 

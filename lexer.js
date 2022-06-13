@@ -11,7 +11,7 @@ let lexer = moo.compile({
   rparen:  ')',
   lbrace:  '{',
   rbrace:  '}',
-  var_type: ['volatile', 'int', 'void'], 
+  var_type: ['volatile', 'int', 'void', 'char', 'string'], 
   identifier: /[a-zA-Z][a-zA-Z_0-9]*/,
   assign: '=',
   comma: ',', 

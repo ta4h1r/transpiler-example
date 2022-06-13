@@ -66,6 +66,7 @@ var_assign
 
 expr
     -> %string     {% id %}
+    |  %char     {% id %}
     |  %number     {% id %}
     |  %identifier {% id %}
     # |  fun_call    {% id %}

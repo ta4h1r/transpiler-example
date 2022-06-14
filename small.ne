@@ -21,7 +21,8 @@ statement
     -> var_declare  {% id %}
     | var_assign    {% id %}
     | method        {% id %}
-    | fun_call        {% id %}
+    | fun_call      {% id %}
+    | control       {% id %}
 
 var_declare
     -> (%var_type _):+ %identifier _ %EL
@@ -61,9 +62,18 @@ var_assign
 expr
     -> %string     {% id %}
     |  %char       {% id %}
+    |  %float      {% id %}
     |  %number     {% id %}
     |  %identifier {% id %}
+    |  fun_call__  {% id %}
 
+float 
+    -> %number %dot %number {% (data) => {
+        return {
+            type: "float", 
+            value: `${data[0]}${data[1]}${data[2]}`
+        }
+    } %}
 
 
 
@@ -123,11 +133,23 @@ fun_params
         %}
 
 fun_call
-    -> %identifier _ "(" arg_list ")" %EL
+    -> %identifier _ "(" arg_list ")" _ %EL
         {%
             (data) => {
                 return {
                     type: "fun_call",
+                    fun_name: data[0],
+                    arguments: data[3]
+                }
+            }
+        %}
+
+fun_call__
+    -> %identifier _ "(" arg_list ")" _
+        {%
+            (data) => {
+                return {
+                    type: "fun_call__",
                     fun_name: data[0],
                     arguments: data[3]
                 }
@@ -147,6 +169,42 @@ arg_list
 
 
 
+
+
+
+
+
+
+control
+    -> condition control_body
+
+condition 
+    -> %control _ "(" _ expr _ %conditional _ expr _ ")" _ml "{"
+        {%
+            (data) => {
+                return {
+                    type: "condition", 
+                    left: data[4], 
+                    conditional: data[6], 
+                    right: data[8], 
+                };
+            }
+        %}
+
+control_body
+    -> statements "}"
+        {%
+            (data) => {
+                return {
+                    type: "control_body", 
+                    statements: data[0], 
+                };
+            }
+        %}
+
+
+
+
 # Mandatory line-break with optional whitespace around it
 __lb_ -> (_ %NL):+ _
 
@@ -156,7 +214,7 @@ _ml -> (%WS | %NL):*
 # Mandatory multi-line whitespace
 __ml -> (%WS | %NL):+
 
-# Optional whitespace    
+# Optional whitespace
 _ -> %WS:*
 
 # Mandatory whitespace

@@ -169,5 +169,14 @@ void loop()
   {
     right_motor(0,'F');
   }
+  while (digitalRead(4) == 0)
+  {
+    right_motor(0,'F');
+
+
+
+
+    
+  }
 
 }

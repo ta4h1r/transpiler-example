@@ -195,6 +195,15 @@ var grammar = {
             }
         }
                 },
+    {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "_", "check", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+        (data) => {
+            return {
+                type: "loop_params", 
+                loop_key: data[0], 
+                check: data[4],
+            }
+        }
+                },
     {"name": "stop_condition", "symbols": ["expr", "_", (myLexer.has("conditional") ? {type: "conditional"} : conditional), "_", "expr", "_", (myLexer.has("EL") ? {type: "EL"} : EL)], "postprocess": 
         (data) => {
             return {

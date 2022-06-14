@@ -226,7 +226,7 @@ loop
     -> loop_params loop_body    {% id %}
 
 loop_params
-    -> %loop_key _ "(" var_assign _ stop_condition _ incrementor _ ")" _ml "{"
+    -> %loop_key _ "(" var_assign _ stop_condition _ incrementor _ ")" _ml "{"     # Match for loop syntax
         {%
             (data) => {
                 return {
@@ -235,6 +235,16 @@ loop_params
                     counter_var: data[3], 
                     stop_condition: data[5], 
                     incrementor: data[7], 
+                }
+            }
+        %}
+    |  %loop_key _ "(" _ check _ ")" _ml "{"    # Match while loop syntax
+        {%
+            (data) => {
+                return {
+                    type: "loop_params", 
+                    loop_key: data[0], 
+                    check: data[4],
                 }
             }
         %}

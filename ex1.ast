@@ -4130,6 +4130,65 @@
               "col": 22
             }
           }
+        },
+        {
+          "type": "loop_params",
+          "loop_key": {
+            "type": "loop_key",
+            "value": "while",
+            "text": "while",
+            "offset": 2962,
+            "lineBreaks": 0,
+            "line": 172,
+            "col": 3
+          },
+          "check": {
+            "type": "check",
+            "left": {
+              "type": "fun_call__",
+              "fun_name": {
+                "type": "identifier",
+                "value": "digitalRead",
+                "text": "digitalRead",
+                "offset": 2969,
+                "lineBreaks": 0,
+                "line": 172,
+                "col": 10
+              },
+              "arguments": {
+                "type": "arg_list",
+                "arg_values": [
+                  {
+                    "type": "number",
+                    "value": "4",
+                    "text": "4",
+                    "offset": 2981,
+                    "lineBreaks": 0,
+                    "line": 172,
+                    "col": 22
+                  }
+                ]
+              }
+            },
+            "conditional": {
+              "type": "conditional",
+              "value": "==",
+              "text": "==",
+              "offset": 2984,
+              "lineBreaks": 0,
+              "line": 172,
+              "col": 25
+            },
+            "right": {
+              "type": "number",
+              "value": "0",
+              "text": "0",
+              "offset": 2987,
+              "lineBreaks": 0,
+              "line": 172,
+              "col": 28
+            }
+          }
         }
       ]
     }

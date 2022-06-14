@@ -18,12 +18,12 @@ async function main() {
     
     if (parser.results.length > 1) {
         console.error("Error: ambigous grammar detected");
-        // for (let i = 0; i < parser.results.length; i++) {
-        //     const ast = parser.results[i];
-        //     const outputFilename = filename.replace(".small", "-" + i + ".ast");
-        //     await fs.writeFile(outputFilename, JSON.stringify(ast, null, "  "));
-        //     console.log(`Wrote ${outputFilename}.`);    
-        // }
+        for (let i = 0; i < parser.results.length; i++) {
+            const ast = parser.results[i];
+            const outputFilename = filename.replace(".small", "-" + i + ".ast");
+            await fs.writeFile(outputFilename, JSON.stringify(ast, null, "  "));
+            console.log(`Wrote ${outputFilename}.`);    
+        }
     } else if (parser.results.length == 1) {
         const ast = parser.results[0];
         const outputFilename = filename.replace(".small", ".ast");

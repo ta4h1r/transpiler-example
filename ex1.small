@@ -137,18 +137,13 @@ void setup()
 
 void loop()
 {
-  Turn_left();
-  Turn_right();
-  forward(152);
-  backward(152);
-  rotate_left(152);
-  rotate_right(152);
+
   if (digitalRead(4) == 0 && digitalRead(5) == 0)
   {
     movement(152,'F',1000);
   } else if (digitalRead(4) == 0 && digitalRead(5) == 0) {
     movement(128,'B',1000);} else if (digitalRead(4) == 0 && digitalRead(5) == 0) {
     left_motor(127.5,'F');}
-  stop();
+
 
 }

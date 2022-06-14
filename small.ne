@@ -23,6 +23,7 @@ statement
     | method        {% id %}
     | fun_call      {% id %}
     | control       {% id %}
+    | loop          {% id %}
 
 var_declare
     -> (%var_type _):+ %identifier _ %EL
@@ -168,16 +169,17 @@ arg_list
 
 
 control
-    -> condition control_body
+    -> condition control_body   {% id %}
 
 condition 
-    -> %control _ "(" _ check _ (%logical _ check):* _ ")" _ml "{"
+    -> (%control_key _):+ "(" _ check _ (%logical _ check):* _ ")" _ml "{"
         {%
             (data) => {
                 return {
                     type: "condition",
-                    checks: [data[4], ...data[6].map(x => x[2])],
-                    logicals: [data[6].map(x => x[0])], 
+                    control_keys: data[0].map(x => x[0]),
+                    checks: [data[3], ...data[5].map(x => x[2])],
+                    logicals: [data[5].map(x => x[0])], 
                 };
             }
         %}
@@ -205,6 +207,17 @@ control_body
                 };
             }
         %}
+
+
+
+
+
+loop
+    -> _ml %loop_key _ml
+    
+    
+    #_ "(" # _ var_assign #_ stop_condition _ %EL _ %incrementor _ ")" _ml "{"
+
 
 
 

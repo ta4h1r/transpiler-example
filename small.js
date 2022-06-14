@@ -20,6 +20,7 @@ var grammar = {
     {"name": "statement", "symbols": ["method"], "postprocess": id},
     {"name": "statement", "symbols": ["fun_call"], "postprocess": id},
     {"name": "statement", "symbols": ["control"], "postprocess": id},
+    {"name": "statement", "symbols": ["loop"], "postprocess": id},
     {"name": "var_declare$ebnf$1$subexpression$1", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type), "_"]},
     {"name": "var_declare$ebnf$1", "symbols": ["var_declare$ebnf$1$subexpression$1"]},
     {"name": "var_declare$ebnf$1$subexpression$2", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type), "_"]},
@@ -134,16 +135,21 @@ var grammar = {
             }
         }
                 },
-    {"name": "control", "symbols": ["condition", "control_body"]},
-    {"name": "condition$ebnf$1", "symbols": []},
-    {"name": "condition$ebnf$1$subexpression$1", "symbols": [(myLexer.has("logical") ? {type: "logical"} : logical), "_", "check"]},
-    {"name": "condition$ebnf$1", "symbols": ["condition$ebnf$1", "condition$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "condition", "symbols": [(myLexer.has("control") ? {type: "control"} : control), "_", {"literal":"("}, "_", "check", "_", "condition$ebnf$1", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+    {"name": "control", "symbols": ["condition", "control_body"], "postprocess": id},
+    {"name": "condition$ebnf$1$subexpression$1", "symbols": [(myLexer.has("control_key") ? {type: "control_key"} : control_key), "_"]},
+    {"name": "condition$ebnf$1", "symbols": ["condition$ebnf$1$subexpression$1"]},
+    {"name": "condition$ebnf$1$subexpression$2", "symbols": [(myLexer.has("control_key") ? {type: "control_key"} : control_key), "_"]},
+    {"name": "condition$ebnf$1", "symbols": ["condition$ebnf$1", "condition$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "condition$ebnf$2", "symbols": []},
+    {"name": "condition$ebnf$2$subexpression$1", "symbols": [(myLexer.has("logical") ? {type: "logical"} : logical), "_", "check"]},
+    {"name": "condition$ebnf$2", "symbols": ["condition$ebnf$2", "condition$ebnf$2$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "condition", "symbols": ["condition$ebnf$1", {"literal":"("}, "_", "check", "_", "condition$ebnf$2", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
         (data) => {
             return {
                 type: "condition",
-                checks: [data[4], ...data[6].map(x => x[2])],
-                logicals: [data[6].map(x => x[0])], 
+                control_keys: data[0].map(x => x[0]),
+                checks: [data[3], ...data[5].map(x => x[2])],
+                logicals: [data[5].map(x => x[0])], 
             };
         }
                 },
@@ -165,6 +171,7 @@ var grammar = {
             };
         }
                 },
+    {"name": "loop", "symbols": ["_ml", (myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_ml"]},
     {"name": "__lb_$ebnf$1$subexpression$1", "symbols": ["_", (myLexer.has("NL") ? {type: "NL"} : NL)]},
     {"name": "__lb_$ebnf$1", "symbols": ["__lb_$ebnf$1$subexpression$1"]},
     {"name": "__lb_$ebnf$1$subexpression$2", "symbols": ["_", (myLexer.has("NL") ? {type: "NL"} : NL)]},

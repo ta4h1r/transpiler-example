@@ -171,7 +171,19 @@ var grammar = {
             };
         }
                 },
-    {"name": "loop", "symbols": ["_ml", (myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_ml"]},
+    {"name": "loop", "symbols": ["loop_params", "loop_body"]},
+    {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "var_assign", "_", "stop_condition", "_", "incrementor", "_", {"literal":")"}, "_ml", {"literal":"{"}]},
+    {"name": "stop_condition", "symbols": ["expr", "_", (myLexer.has("conditional") ? {type: "conditional"} : conditional), "_", "expr", "_", (myLexer.has("EL") ? {type: "EL"} : EL)]},
+    {"name": "incrementor", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), {"literal":"++"}]},
+    {"name": "incrementor", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), {"literal":"--"}]},
+    {"name": "loop_body", "symbols": ["statements", {"literal":"}"}], "postprocess": 
+        (data) => {
+            return {
+                type: "control_body", 
+                statements: data[0], 
+            };
+        }
+            },
     {"name": "__lb_$ebnf$1$subexpression$1", "symbols": ["_", (myLexer.has("NL") ? {type: "NL"} : NL)]},
     {"name": "__lb_$ebnf$1", "symbols": ["__lb_$ebnf$1$subexpression$1"]},
     {"name": "__lb_$ebnf$1$subexpression$2", "symbols": ["_", (myLexer.has("NL") ? {type: "NL"} : NL)]},

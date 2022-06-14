@@ -213,12 +213,28 @@ control_body
 
 
 loop
-    -> _ml %loop_key _ml
-    
-    
-    #_ "(" # _ var_assign #_ stop_condition _ %EL _ %incrementor _ ")" _ml "{"
+    -> loop_params loop_body
 
+loop_params
+    -> %loop_key _ "(" var_assign _ stop_condition _ incrementor _ ")" _ml "{"
 
+stop_condition 
+    -> expr _ %conditional _ expr _ %EL
+
+incrementor
+    -> %identifier "++"
+    |  %identifier "--"
+
+loop_body
+-> statements "}"
+    {%
+        (data) => {
+            return {
+                type: "control_body", 
+                statements: data[0], 
+            };
+        }
+    %}
 
 
 

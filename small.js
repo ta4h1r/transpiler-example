@@ -61,8 +61,20 @@ var grammar = {
     {"name": "expr", "symbols": [(myLexer.has("char") ? {type: "char"} : char)], "postprocess": id},
     {"name": "expr", "symbols": [(myLexer.has("float") ? {type: "float"} : float)], "postprocess": id},
     {"name": "expr", "symbols": [(myLexer.has("number") ? {type: "number"} : number)], "postprocess": id},
-    {"name": "expr", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier)], "postprocess": id},
+    {"name": "expr", "symbols": ["identifiers"], "postprocess": id},
     {"name": "expr", "symbols": ["fun_call__"], "postprocess": id},
+    {"name": "identifiers$ebnf$1", "symbols": []},
+    {"name": "identifiers$ebnf$1$subexpression$1", "symbols": [(myLexer.has("lbrack") ? {type: "lbrack"} : lbrack), (myLexer.has("identifier") ? {type: "identifier"} : identifier), (myLexer.has("rbrack") ? {type: "rbrack"} : rbrack)]},
+    {"name": "identifiers$ebnf$1", "symbols": ["identifiers$ebnf$1", "identifiers$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "identifiers", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), "identifiers$ebnf$1"], "postprocess": 
+        (data) => {
+            return {
+                type: "identifiers", 
+                primary: data[0],
+                auxiliary: data[1].map(x => x[1])
+            }
+        }
+                },
     {"name": "method", "symbols": ["fun_signature", "fun_body"], "postprocess": 
         (data) => {
             return {
@@ -171,11 +183,46 @@ var grammar = {
             };
         }
                 },
-    {"name": "loop", "symbols": ["loop_params", "loop_body"]},
-    {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "var_assign", "_", "stop_condition", "_", "incrementor", "_", {"literal":")"}, "_ml", {"literal":"{"}]},
-    {"name": "stop_condition", "symbols": ["expr", "_", (myLexer.has("conditional") ? {type: "conditional"} : conditional), "_", "expr", "_", (myLexer.has("EL") ? {type: "EL"} : EL)]},
-    {"name": "incrementor", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), {"literal":"++"}]},
-    {"name": "incrementor", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), {"literal":"--"}]},
+    {"name": "loop", "symbols": ["loop_params", "loop_body"], "postprocess": id},
+    {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "var_assign", "_", "stop_condition", "_", "incrementor", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+        (data) => {
+            return {
+                type: "loop_params", 
+                loop_key: data[0], 
+                counter_var: data[3], 
+                stop_condition: data[5], 
+                incrementor: data[7], 
+            }
+        }
+                },
+    {"name": "stop_condition", "symbols": ["expr", "_", (myLexer.has("conditional") ? {type: "conditional"} : conditional), "_", "expr", "_", (myLexer.has("EL") ? {type: "EL"} : EL)], "postprocess": 
+        (data) => {
+            return {
+                type: "stop_condition", 
+                left: data[0], 
+                conditional: data[2], 
+                right: data[4], 
+            }
+        }
+                },
+    {"name": "incrementor", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), {"literal":"++"}], "postprocess": 
+        (data) => {
+            return {
+                type: "incrementor", 
+                identifier: data[0], 
+                op: data[1],
+            }
+        }
+                },
+    {"name": "incrementor", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), {"literal":"--"}], "postprocess": 
+        (data) => {
+            return {
+                type: "incrementor", 
+                identifier: data[0], 
+                op: data[1],
+            }
+        }
+                },
     {"name": "loop_body", "symbols": ["statements", {"literal":"}"}], "postprocess": 
         (data) => {
             return {

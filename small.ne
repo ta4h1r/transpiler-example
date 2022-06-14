@@ -65,10 +65,20 @@ expr
     |  %char       {% id %}
     |  %float      {% id %}
     |  %number     {% id %}
-    |  %identifier {% id %}
+    |  identifiers {% id %}
     |  fun_call__  {% id %}
 
-
+identifiers 
+    -> %identifier (%lbrack %identifier %rbrack):*
+        {%
+            (data) => {
+                return {
+                    type: "identifiers", 
+                    primary: data[0],
+                    auxiliary: data[1].map(x => x[1])
+                }
+            }
+        %}
 
 
 
@@ -213,17 +223,56 @@ control_body
 
 
 loop
-    -> loop_params loop_body
+    -> loop_params loop_body    {% id %}
 
 loop_params
     -> %loop_key _ "(" var_assign _ stop_condition _ incrementor _ ")" _ml "{"
+        {%
+            (data) => {
+                return {
+                    type: "loop_params", 
+                    loop_key: data[0], 
+                    counter_var: data[3], 
+                    stop_condition: data[5], 
+                    incrementor: data[7], 
+                }
+            }
+        %}
 
 stop_condition 
     -> expr _ %conditional _ expr _ %EL
+        {%
+            (data) => {
+                return {
+                    type: "stop_condition", 
+                    left: data[0], 
+                    conditional: data[2], 
+                    right: data[4], 
+                }
+            }
+        %}
 
 incrementor
-    -> %identifier "++"
-    |  %identifier "--"
+    -> %identifier "++" 
+        {%
+            (data) => {
+                return {
+                    type: "incrementor", 
+                    identifier: data[0], 
+                    op: data[1],
+                }
+            }
+        %}
+    |  %identifier "--" 
+        {%
+            (data) => {
+                return {
+                    type: "incrementor", 
+                    identifier: data[0], 
+                    op: data[1],
+                }
+            }
+        %}
 
 loop_body
 -> statements "}"

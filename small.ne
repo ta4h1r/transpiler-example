@@ -67,14 +67,6 @@ expr
     |  %identifier {% id %}
     |  fun_call__  {% id %}
 
-float 
-    -> %number %dot %number {% (data) => {
-        return {
-            type: "float", 
-            value: `${data[0]}${data[1]}${data[2]}`
-        }
-    } %}
-
 
 
 
@@ -144,8 +136,8 @@ fun_call
             }
         %}
 
-fun_call__
-    -> %identifier _ "(" arg_list ")" _
+fun_call__           # Without the semi-colon, for use in conditional statements
+    -> %identifier _ "(" arg_list ")"
         {%
             (data) => {
                 return {
@@ -179,14 +171,26 @@ control
     -> condition control_body
 
 condition 
-    -> %control _ "(" _ expr _ %conditional _ expr _ ")" _ml "{"
+    -> %control _ "(" _ check _ (%logical _ check):* _ ")" _ml "{"
         {%
             (data) => {
                 return {
-                    type: "condition", 
-                    left: data[4], 
-                    conditional: data[6], 
-                    right: data[8], 
+                    type: "condition",
+                    checks: [data[4], ...data[6].map(x => x[2])],
+                    logicals: [data[6].map(x => x[0])], 
+                };
+            }
+        %}
+
+check
+    -> expr _ %conditional _ expr    # Compare two variables
+     {%
+            (data) => {
+                return {
+                    type: "check", 
+                    left: data[0], 
+                    conditional: data[2], 
+                    right: data[4], 
                 };
             }
         %}

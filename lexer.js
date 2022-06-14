@@ -13,6 +13,7 @@ let lexer = moo.compile({           // NB: First things match first. The order o
   lbrace:  '{',
   rbrace:  '}',
   conditional: ['==', '<', '>', '<=', '>='],
+  logical: ['&&', '||'],
   control: ['if', 'else if', 'else'],
   loop: [/^for$/, /^while$/],  
   var_type: ['volatile', 'int', 'void', 'char', 'string'], 

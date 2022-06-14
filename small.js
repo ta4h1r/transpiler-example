@@ -62,12 +62,6 @@ var grammar = {
     {"name": "expr", "symbols": [(myLexer.has("number") ? {type: "number"} : number)], "postprocess": id},
     {"name": "expr", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier)], "postprocess": id},
     {"name": "expr", "symbols": ["fun_call__"], "postprocess": id},
-    {"name": "float", "symbols": [(myLexer.has("number") ? {type: "number"} : number), (myLexer.has("dot") ? {type: "dot"} : dot), (myLexer.has("number") ? {type: "number"} : number)], "postprocess":  (data) => {
-            return {
-                type: "float", 
-                value: `${data[0]}${data[1]}${data[2]}`
-            }
-        } },
     {"name": "method", "symbols": ["fun_signature", "fun_body"], "postprocess": 
         (data) => {
             return {
@@ -118,7 +112,7 @@ var grammar = {
             }
         }
                 },
-    {"name": "fun_call__", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"("}, "arg_list", {"literal":")"}, "_"], "postprocess": 
+    {"name": "fun_call__", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"("}, "arg_list", {"literal":")"}], "postprocess": 
         (data) => {
             return {
                 type: "fun_call__",
@@ -141,13 +135,25 @@ var grammar = {
         }
                 },
     {"name": "control", "symbols": ["condition", "control_body"]},
-    {"name": "condition", "symbols": [(myLexer.has("control") ? {type: "control"} : control), "_", {"literal":"("}, "_", "expr", "_", (myLexer.has("conditional") ? {type: "conditional"} : conditional), "_", "expr", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+    {"name": "condition$ebnf$1", "symbols": []},
+    {"name": "condition$ebnf$1$subexpression$1", "symbols": [(myLexer.has("logical") ? {type: "logical"} : logical), "_", "check"]},
+    {"name": "condition$ebnf$1", "symbols": ["condition$ebnf$1", "condition$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "condition", "symbols": [(myLexer.has("control") ? {type: "control"} : control), "_", {"literal":"("}, "_", "check", "_", "condition$ebnf$1", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
         (data) => {
             return {
-                type: "condition", 
-                left: data[4], 
-                conditional: data[6], 
-                right: data[8], 
+                type: "condition",
+                checks: [data[4], ...data[6].map(x => x[2])],
+                logicals: [data[6].map(x => x[0])], 
+            };
+        }
+                },
+    {"name": "check", "symbols": ["expr", "_", (myLexer.has("conditional") ? {type: "conditional"} : conditional), "_", "expr"], "postprocess": 
+        (data) => {
+            return {
+                type: "check", 
+                left: data[0], 
+                conditional: data[2], 
+                right: data[4], 
             };
         }
                 },

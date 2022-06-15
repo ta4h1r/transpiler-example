@@ -147,21 +147,29 @@ var grammar = {
             }
         }
                 },
-    {"name": "control", "symbols": ["condition", "control_body"], "postprocess": id},
+    {"name": "control", "symbols": ["condition", "control_body"], "postprocess":  
+        (data) => {
+            return {
+                type: "control", 
+                condition: data[0], 
+                body: data[1]
+            }
+        } 
+                },
     {"name": "condition$ebnf$1$subexpression$1", "symbols": [(myLexer.has("control_key") ? {type: "control_key"} : control_key), "_"]},
     {"name": "condition$ebnf$1", "symbols": ["condition$ebnf$1$subexpression$1"]},
     {"name": "condition$ebnf$1$subexpression$2", "symbols": [(myLexer.has("control_key") ? {type: "control_key"} : control_key), "_"]},
     {"name": "condition$ebnf$1", "symbols": ["condition$ebnf$1", "condition$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "condition$ebnf$2", "symbols": []},
-    {"name": "condition$ebnf$2$subexpression$1", "symbols": [(myLexer.has("logical") ? {type: "logical"} : logical), "_", "check"]},
+    {"name": "condition$ebnf$2$subexpression$1", "symbols": [(myLexer.has("logical") ? {type: "logical"} : logical), "_", "check", "_"]},
     {"name": "condition$ebnf$2", "symbols": ["condition$ebnf$2", "condition$ebnf$2$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "condition", "symbols": ["condition$ebnf$1", {"literal":"("}, "_", "check", "_", "condition$ebnf$2", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+    {"name": "condition", "symbols": ["condition$ebnf$1", {"literal":"("}, "_", "check", "_", "condition$ebnf$2", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
         (data) => {
             return {
                 type: "condition",
                 control_keys: data[0].map(x => x[0]),
                 checks: [data[3], ...data[5].map(x => x[2])],
-                logicals: [data[5].map(x => x[0])], 
+                logicals: data[5].map(x => x[0]), 
             };
         }
                 },
@@ -183,7 +191,15 @@ var grammar = {
             };
         }
                 },
-    {"name": "loop", "symbols": ["loop_params", "loop_body"], "postprocess": id},
+    {"name": "loop", "symbols": ["loop_params", "loop_body"], "postprocess":  
+        (data) => {
+            return {
+                type: "loop", 
+                loop_params: data[0], 
+                body: data[1]
+            }
+        } 
+                },
     {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "var_assign", "_", "stop_condition", "_", "incrementor", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
         (data) => {
             return {

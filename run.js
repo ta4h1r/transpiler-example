@@ -12,7 +12,7 @@ async function main() {
     const jsFilename = filename.replace(".small", ".js");
     await myExec(`node parse.js ${filename}`);
     await myExec(`node generate.js ${astFilename}`);
-    await myExec(`node ${jsFilename}`);
+    // await myExec(`node ${jsFilename}`);
 }
 
 async function myExec(command) {

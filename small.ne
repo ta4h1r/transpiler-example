@@ -179,23 +179,32 @@ arg_list
 
 
 control
-    -> condition control_body   {% id %}
+    -> condition control_body   
+        {% 
+            (data) => {
+                return {
+                    type: "control", 
+                    condition: data[0], 
+                    body: data[1]
+                }
+            } 
+        %}
 
 condition 
-    -> (%control_key _):+ "(" _ check _ (%logical _ check):* _ ")" _ml "{"
+    -> (%control_key _):+ "(" _ check _ (%logical _ check _):* ")" _ml "{"
         {%
             (data) => {
                 return {
                     type: "condition",
                     control_keys: data[0].map(x => x[0]),
                     checks: [data[3], ...data[5].map(x => x[2])],
-                    logicals: [data[5].map(x => x[0])], 
+                    logicals: data[5].map(x => x[0]), 
                 };
             }
         %}
 
 check
-    -> expr _ %conditional _ expr    # Compare two variables
+    -> expr _ %conditional _ expr    # Comparison of two variables
      {%
             (data) => {
                 return {
@@ -223,7 +232,16 @@ control_body
 
 
 loop
-    -> loop_params loop_body    {% id %}
+    -> loop_params loop_body    
+        {% 
+            (data) => {
+                return {
+                    type: "loop", 
+                    loop_params: data[0], 
+                    body: data[1]
+                }
+            } 
+        %}
 
 loop_params
     -> %loop_key _ "(" var_assign _ stop_condition _ incrementor _ ")" _ml "{"     # Match for loop syntax

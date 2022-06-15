@@ -9,36 +9,42 @@ async function main() {
 
     const astJson = (await fs.readFile(filename)).toString();
     const statements = JSON.parse(astJson);
+
     const jsCode = generateJsForStatements(statements);
-    // const outputFilename = filename.replace(".ast", ".js");
-    // await fs.writeFile(outputFilename, jsCode);
-    // console.log(`Wrote ${outputFilename}.`);
+    const outputFilename = filename.replace(".ast", ".js");
+    await fs.writeFile(outputFilename, jsCode);
+    console.log(`Wrote ${outputFilename}.`);
 }
 
 function generateJsForStatements(statements) {
     const lines = [];
+    // console.log(statements)
     for (let statement of statements) {
-        const line = generateJsForStatementOrExpr(statement);
+        const line = generateJsForStatement(statement);
         lines.push(line);
     }
-    return lines.join("\n");
+    return lines.join("");
 }
 
-function generateJsForStatementOrExpr(node) {
+function generateJsForStatement(node) {
+    let js = ``;
     if (node.type === "method") {
         const methodName = node.signature.name.value;
         if (methodName === "loop") {
-            console.log("Found loop method\n");
+            console.log("\nFound loop method\n");
             const body = node.body;
-            body.statements.forEach(statement => {
+            body.statements.forEach((statement, index) => {
                 const statementType = statement.type
                 switch (statementType) {
                     case "fun_call":
-                        return handleFunCall(statement);
+                        js += handleFunCall(statement, EL = true);
+                        break;
                     case "control":
-                        return handleControl(statement);
+                        js += handleControl(statement);
+                        break;
                     case "loop":
-                        return handleLoop(statement)
+                        js += handleLoop(statement);
+                        break;
                 }
             })
         }
@@ -46,15 +52,17 @@ function generateJsForStatementOrExpr(node) {
         // const jsExpr = generateJsForStatementOrExpr(node.value);
         // const js = `var ${varName} = ${jsExpr};`;
         // return js;
-    } else if (node.type === "fun_call") {
-        const funName = node.fun_name.value;
-        const argList = node.arguments.map((arg) => {
-            return generateJsForStatementOrExpr(arg);
-        }).join(", ");
-        return `${funName}(${argList})`;
-    } else {
+    }
+    // else if (node.type === "fun_call") {
+    //     const funName = node.fun_name.value;
+    //     const argList = node.arguments.map((arg) => {
+    //         return generateJsForStatementOrExpr(arg);
+    //     }).join(", ");
+    //     return `${funName}(${argList})`; }
+    else {
         throw new Error(`Unhandled AST node type: ${node.type}`);
     }
+    return js;
 }
 
 main().catch(err => console.log(err.stack));
@@ -73,19 +81,18 @@ main().catch(err => console.log(err.stack));
 function handleControl(statement) {
     const { condition, body } = statement;
     const { checks, logicals: logical_ops, control_keys } = condition;
-    console.log("\n\n ")
     let left = checks.map(check => check.left)
     let conditional = checks.map(check => check.conditional.value)
     let right = checks.map(check => check.right)
     let logicals = logical_ops.map(logical => logical.value)
     let key = control_keys.map(key => key.value).join(" ")
-    
+
     let str = `${key} (`;
     str += handleConditional(left, conditional, right, logicals);
-    
+
     const { statements } = body;
     str += handleStatements(statements);
-    
+
     return str;
 }
 
@@ -102,7 +109,7 @@ function handleConditional(left, conditional, right, logicals = []) {
      *   e.g., digitalRead(4) == 0 && digitalRead(5) >= 0 && digitalRead(7) < 0) {
      * 
      */
-    let str = ``; 
+    let str = ``;
     for (let i = 0, n = left.length; i < n; i++) {
         str += `${left[i].type === "fun_call__" ? handleFunCall(left[i]) : (left[i].value ? left[i].value : left[i])}`;
         str += ` ${conditional[i]} `;
@@ -116,42 +123,45 @@ function handleConditional(left, conditional, right, logicals = []) {
     return str;
 }
 
-function handleFunCall(statement) {
+function handleFunCall(statement, EL = false) {
     /**
      * 
      * Produces output string @str as 
      * 
      * functionName(arg1, arg2, ...)
      * 
+     * OR 
+     * 
+     * functionName(arg1, arg2, ...);\n    // if @EL === truthy
+     * 
      */
     const { fun_name, arguments } = statement;
     let functionName = fun_name.value;
     let args = arguments.arg_values.map(arg => arg.value);
     let str = `${functionName}(`;
-    if (args.length === 0) str += `)`;
+    if (args.length === 0) (EL === true ? str += `);\n` : str += str += `)`);
     else args.forEach((arg, index) => {
-        if (index === args.length - 1) str += `${arg})`
+        if (index === args.length - 1) (EL === true ? str += `${arg});\n` : str += `${arg})`)
         else str += `${arg}, `
     })
     return str;
 }
 
 function handleLoop(statement) {
-    // console.log(statement)
     const { loop_params, body } = statement;
     const { loop_key, counter_var, stop_condition, incrementor } = loop_params;
     const { statements } = body;
 
     let str = `${loop_key.value} (`;
-    if(counter_var) {              // Handle for loop
+    if (counter_var) {              // Handle for loop
         const counterName = counter_var.var_name.value;
         const initialCounterValue = counter_var.value.value
-        let left = [stop_condition.left.primary.value]; 
-        let right = [stop_condition.right.value]; 
-        let conditional = [stop_condition.conditional.value]; 
-        str += `let ${counterName} = ${initialCounterValue}; `
+        let left = [stop_condition.left.primary.value];
+        let right = [stop_condition.right.value];
+        let conditional = [stop_condition.conditional.value];
+        str += `let ${counterName} = ${initialCounterValue}; `;
         str += handleConditional(left, conditional, right);
-        str = str.substring(0, str.length - 4); 
+        str = str.substring(0, str.length - 4);
         str += `; ${incrementor.identifier.value}${incrementor.op.value}) {\n`
         str += handleStatements(statements);
     } else {                       // Handle while loop 
@@ -161,8 +171,6 @@ function handleLoop(statement) {
         str += handleConditional([left], [conditional.value], [right], [])
         str += handleStatements(statements);
     }
-    console.log(str)
-    str += `${loop_key.value} (let ${counter_var} = )`
     return str;
 }
 
@@ -176,7 +184,7 @@ function handleLoop(statement) {
 
 
 
-function handleStatements(statements) {
+function handleStatements(statements, indent = true) {
     /**
      * 
      * Produces output string @str as 
@@ -192,7 +200,7 @@ function handleStatements(statements) {
     let str = ``;
     statements.forEach((statement, index) => {
         if (statement.type === "fun_call") {
-            str += "    " + handleFunCall(statement);
+            indent ? str += "    " + handleFunCall(statement) : str += handleFunCall(statement);
             if (index === statements.length - 1)
                 str += ";\n}\n";
             else

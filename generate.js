@@ -79,40 +79,51 @@ function handleControl(statement) {
     let right = checks.map(check => check.right)
     let logicals = logical_ops.map(logical => logical.value)
     let key = control_keys.map(key => key.value).join(" ")
-
+    
     let str = `${key} (`;
+    str += handleConditional(left, conditional, right, logicals);
+    
+    const { statements } = body;
+    str += handleStatements(statements);
+    
+    return str;
+}
+
+
+function handleConditional(left, conditional, right, logicals = []) {
+    /**
+     * 
+     * Ingest @left @right @conditional and @logicals arrays. 
+     * 
+     * Produces output string @str as 
+     * 
+     *   @expression @conditional @value (@logical ...) {
+     *  
+     *   e.g., digitalRead(4) == 0 && digitalRead(5) >= 0 && digitalRead(7) < 0) {
+     * 
+     */
+    let str = ``; 
     for (let i = 0, n = left.length; i < n; i++) {
-        str += `${left[i].type === "fun_call__" ? handleFunCall(left[i]) : left[i].value}`;
+        str += `${left[i].type === "fun_call__" ? handleFunCall(left[i]) : (left[i].value ? left[i].value : left[i])}`;
         str += ` ${conditional[i]} `;
-        str += `${right[i].type === "fun_call__" ? handleFunCall(right[i]) : right[i].value}`;
+        str += `${right[i].type === "fun_call__" ? handleFunCall(right[i]) : (right[i].value ? right[i].value : right[i])}`;
         if (logicals[i]) {
-            str += ` ${logicals[i]} `
+            str += ` ${logicals[i]} `;
         } else if (i === n - 1) {
             str += `) {\n`;
         }
     }
-
-    const { statements } = body;
-
-    statements.forEach((statement, index) => {
-        if (statement.type === "fun_call") {
-            str += "    " + handleFunCall(statement);
-            if (index === statements.length - 1) str += ";\n}\n"
-            else str += `;\n`;
-        } else if (statement.type === "var_assign") {
-            str += "    " + handleVarAssign(statement);
-            if(index === statements.length -1) str += ";\n}\n"  
-        } else if (statement.type === "var_declare") {
-            str += "    " + handleVarDeclare(statement);
-            if(index === statements.length -1) str += ";\n}\n"  
-        }
-    })
-
-    console.log(str);
     return str;
 }
 
 function handleFunCall(statement) {
+    /**
+     * 
+     * Produces output string @str as 
+     * 
+     * functionName(arg1, arg2, ...)
+     * 
+     */
     const { fun_name, arguments } = statement;
     let functionName = fun_name.value;
     let args = arguments.arg_values.map(arg => arg.value);
@@ -126,7 +137,33 @@ function handleFunCall(statement) {
 }
 
 function handleLoop(statement) {
+    // console.log(statement)
+    const { loop_params, body } = statement;
+    const { loop_key, counter_var, stop_condition, incrementor } = loop_params;
+    const { statements } = body;
 
+    let str = `${loop_key.value} (`;
+    if(counter_var) {              // Handle for loop
+        const counterName = counter_var.var_name.value;
+        const initialCounterValue = counter_var.value.value
+        let left = [stop_condition.left.primary.value]; 
+        let right = [stop_condition.right.value]; 
+        let conditional = [stop_condition.conditional.value]; 
+        str += `let ${counterName} = ${initialCounterValue}; `
+        str += handleConditional(left, conditional, right);
+        str = str.substring(0, str.length - 4); 
+        str += `; ${incrementor.identifier.value}${incrementor.op.value}) {\n`
+        str += handleStatements(statements);
+    } else {                       // Handle while loop 
+        let left = statement.loop_params.check.left;
+        let right = statement.loop_params.check.right;
+        let conditional = statement.loop_params.check.conditional;
+        str += handleConditional([left], [conditional.value], [right], [])
+        str += handleStatements(statements);
+    }
+    console.log(str)
+    str += `${loop_key.value} (let ${counter_var} = )`
+    return str;
 }
 
 
@@ -138,19 +175,59 @@ function handleLoop(statement) {
 
 
 
+
+function handleStatements(statements) {
+    /**
+     * 
+     * Produces output string @str as 
+     * 
+     *      method1(arg1, arg2, ...);   // i.e., fun_call
+     *      let var;                    // i.e., var_declare
+     *      let var = x;                // i.e., var_assign
+     *      var2 = y;                   // i.e., var_assign
+     *      ...
+     *  }                               <---- NB!
+     * 
+     */
+    let str = ``;
+    statements.forEach((statement, index) => {
+        if (statement.type === "fun_call") {
+            str += "    " + handleFunCall(statement);
+            if (index === statements.length - 1)
+                str += ";\n}\n";
+            else
+                str += `;\n`;
+        } else if (statement.type === "var_assign") {
+            str += "    " + handleVarAssign(statement);
+            if (index === statements.length - 1)
+                str += ";\n}\n";
+        } else if (statement.type === "var_declare") {
+            str += "    " + handleVarDeclare(statement);
+            if (index === statements.length - 1)
+                str += ";\n}\n";
+        }
+    });
+    return str;
+}
+
 function handleVarAssign(statement) {
-    console.log(statement);
     const { var_types, var_name, value } = statement;
-    let str = ``; 
-    if(var_types) {
-        str += var_types.map(t => t.value).join(" ") + ` ${var_name.value} = ${value.value};\n`
+    let str = ``;
+    if (var_types) {
+        str += `let ${var_name.value} = ${value.value};\n`
     } else {
         str += `${var_name.value} = ${value.value};\n`
     }
-    return str; 
+    return str;
 }
 
 function handleVarDeclare(statement) {
-    console.log(statement)
-    return "var_declare ;\n"
+    const { var_types, var_name, } = statement
+    let str = ``;
+    if (var_types) {
+        str += `let ${var_name.value};\n`
+    } else {
+        str += `${var_name.value} = ${value.value};\n`
+    }
+    return str;
 }

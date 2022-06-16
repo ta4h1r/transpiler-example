@@ -84,17 +84,14 @@ void loop()
 {
   if (digitalRead(4) == 0 && digitalRead(5) == 0)
   {
-    int z; 
-    int i = 0; 
-    x = 12; 
     movement(178,'F',3000);
   } else if (digitalRead(4) == 0 && digitalRead(5) == 0) {
-    movement(128,'B',1000); movement(128,'B',1000); movement(128,'B',1000);} else if (digitalRead(4) == 0 && digitalRead(5) == 0 && digitalRead(5) == 0) {
+    movement(128,'B',1000);} else if (digitalRead(4) == 0 && digitalRead(5) == 0) {
     left_motor(127.5,'F');}
   stop();
   for(int i=1;i<346;i++)
   {
-    right_motor(0,'F');
+    right_motor(76.5,'F');
   }
   while (digitalRead(4) == 0)
   {

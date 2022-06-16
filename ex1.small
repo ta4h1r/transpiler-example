@@ -1,102 +1,29 @@
-void stop()
+void Turn_right()
 {
-  analogWrite(9, 0);
-  analogWrite(10, 0);
-}
-
-void movement(int power, char Direction, int pause)
-{
-  pinMode(8, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(A1, OUTPUT);
-  pinMode(10, OUTPUT);
-
-  analogWrite(9, power);
-  analogWrite(10, power);
-
-  if (Direction == 'F')
-  {
-     digitalWrite(8, LOW);
-     digitalWrite(A1, LOW);
-     delay(pause);
-     stop();
-  }
-  else if (Direction == 'B')
-  {
-     digitalWrite(8, HIGH);
-     digitalWrite(8, HIGH);
-     delay(pause);
-     stop();
-  }
-  else if (Direction == 'L')
-  {
-     digitalWrite(8, HIGH);
-     digitalWrite(8, LOW);
-     delay(pause);
-     stop();
-  }
-  else if (Direction == 'R')
-  {
-     digitalWrite(8, LOW);
-     digitalWrite(8, HIGH);
-     delay(pause);
-     stop();
-  }
-}
-
-void left_motor(int power, char Direction)
-{
-  pinMode(8, OUTPUT);
-  pinMode(9, OUTPUT);
-  analogWrite(9, power);
-  if (Direction == 'F')
-  {
-     digitalWrite(8, LOW);
-  }
-  else if (Direction == 'B')
-  {
-     digitalWrite(8, HIGH);
-  }
-}
-
-void right_motor(int power, char Direction)
-{
-  pinMode(A1, OUTPUT);
-  pinMode(10, OUTPUT);
-  analogWrite(10, power);
-  if (Direction == 'F')
-  {
-     digitalWrite(A1, LOW);
-  }
-  else if (Direction == 'B')
-  {
-     digitalWrite(A1, HIGH);
-  }
+ pinMode(A1, OUTPUT);
+ pinMode(8, OUTPUT);
+ pinMode(9, OUTPUT);
+ pinMode(10, OUTPUT);
+ digitalWrite(8, LOW);
+ analogWrite(9, 153);
+ digitalWrite(A1, HIGH);
+ analogWrite(10, 153);
+ delay(350);
+ analogWrite(9, 0);
+ analogWrite(10, 0);
 }
 
 void setup()
 {
-  pinMode(4, INPUT);
   pinMode(5, INPUT);
 }
 
 void loop()
 {
-  if (digitalRead(4) == 0 && digitalRead(5) == 0)
+  if (digitalRead(5) == 0)
   {
-    movement(178,'F',3000);
-  } else if (digitalRead(4) == 0 && digitalRead(5) == 0) {
-    movement(128,'B',1000);} else if (digitalRead(4) == 0 && digitalRead(5) == 0) {
-    left_motor(127.5,'F');}
-  stop();
-  for(int i=1;i<346;i++)
-  {
-    right_motor(76.5,'F');
-  }
-  while (digitalRead(4) == 0)
-  {
-    tone(6, 131);
-    right_motor(0,'F');
-  }
+    
+    Turn_right();
 
+  }
 }

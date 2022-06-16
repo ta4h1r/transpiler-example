@@ -11,9 +11,10 @@ async function main() {
     const statements = JSON.parse(astJson);
 
     const jsCode = generateJsForStatements(statements);
-    const outputFilename = filename.replace(".ast", ".js");
-    await fs.writeFile(outputFilename, jsCode);
-    console.log(`Wrote ${outputFilename}.`);
+    console.log(jsCode)
+    // const outputFilename = filename.replace(".ast", ".js");
+    // await fs.writeFile(outputFilename, jsCode);
+    // console.log(`Wrote ${outputFilename}.`);
 }
 
 function generateJsForStatements(statements) {
@@ -96,7 +97,6 @@ function handleControl(statement) {
     return str;
 }
 
-
 function handleConditional(left, conditional, right, logicals = []) {
     /**
      * 
@@ -138,8 +138,12 @@ function handleFunCall(statement, EL = false) {
     const { fun_name, arguments } = statement;
     let functionName = fun_name.value;
     let args = arguments.arg_values.map(arg => arg.value);
+    console.log(functionName, args.length)
     let str = `${functionName}(`;
-    if (args.length === 0) (EL === true ? str += `);\n` : str += str += `)`);
+    if (args.length === 0) {
+        if(EL === true) str += `);\n`; 
+        else str += `)`;
+    }
     else args.forEach((arg, index) => {
         if (index === args.length - 1) (EL === true ? str += `${arg});\n` : str += `${arg})`)
         else str += `${arg}, `
@@ -200,7 +204,7 @@ function handleStatements(statements, indent = true) {
     let str = ``;
     statements.forEach((statement, index) => {
         if (statement.type === "fun_call") {
-            indent ? str += "    " + handleFunCall(statement) : str += handleFunCall(statement);
+            indent === true ? str += "    " + handleFunCall(statement) : str += handleFunCall(statement);
             if (index === statements.length - 1)
                 str += ";\n}\n";
             else

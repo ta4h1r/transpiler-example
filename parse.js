@@ -1,5 +1,5 @@
 const nearley = require("nearley");
-const grammar = require("./small.js");
+const grammar = require("./grammar.js");
 const fs = require("mz/fs");
 
 async function main() {

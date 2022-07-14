@@ -31,7 +31,7 @@ let lexer = moo.compile({           // NB: First things match first. The order o
 
 module.exports = lexer;
 
-// main(); 
+main(); 
 
 async function main() {
     const code = (await fs.readFile("ex1.small")).toString();

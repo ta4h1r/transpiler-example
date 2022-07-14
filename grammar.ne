@@ -307,11 +307,11 @@ loop_params
                 }
             }
         %}
-    |  %loop_key _ "(" _ %identifier _ ")" _ml "{"    # Match while loop syntax
+    |  %loop_key _ "(" _ expr _ ")" _ml "{"    # Match while loop syntax
         {%
             (data) => {
                 return {
-                    type: "loop_params_id", 
+                    type: "loop_params_expr", 
                     loop_key: data[0], 
                     check: data[4],
                 }

@@ -270,10 +270,10 @@ var grammar = {
             }
         }
                 },
-    {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "_", (myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+    {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "_", "expr", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
         (data) => {
             return {
-                type: "loop_params_id", 
+                type: "loop_params_expr", 
                 loop_key: data[0], 
                 check: data[4],
             }

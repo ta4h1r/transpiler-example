@@ -37,7 +37,9 @@ var grammar = {
     Lexer: myLexer,
     ParserRules: [
     {"name": "statements$ebnf$1", "symbols": []},
-    {"name": "statements$ebnf$1$subexpression$1", "symbols": ["statement", "_ml"]},
+    {"name": "statements$ebnf$1$subexpression$1$ebnf$1", "symbols": []},
+    {"name": "statements$ebnf$1$subexpression$1$ebnf$1", "symbols": ["statements$ebnf$1$subexpression$1$ebnf$1", (myLexer.has("EL") ? {type: "EL"} : EL)], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "statements$ebnf$1$subexpression$1", "symbols": ["statement", "statements$ebnf$1$subexpression$1$ebnf$1", "_ml"]},
     {"name": "statements$ebnf$1", "symbols": ["statements$ebnf$1", "statements$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "statements", "symbols": ["_ml", "statements$ebnf$1"], "postprocess":  
         (data) => {

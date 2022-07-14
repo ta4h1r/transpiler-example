@@ -39,7 +39,7 @@ const myLexer = moo.compile({           // NB: First things match first. The ord
 
 
 statements
-    -> _ml (statement _ml):*
+    -> _ml (statement %EL:* _ml):*
         {% 
             (data) => {
                 return data[1].map(item => item[0]);

@@ -7,6 +7,7 @@ const myLexer = moo.compile({           // NB: First things match first. The ord
   float:   /[-+]?[0-9]*\.[0-9]+/, 
   incrementor: ['++', '--'], 
   number:  /0|[1-9][0-9]*/,
+  bang: '!', 
   string:  /"(?:\\["\\]|[^\n"\\])*"/,
   char:    /'.'/,
   lparen:  '(',
@@ -15,7 +16,7 @@ const myLexer = moo.compile({           // NB: First things match first. The ord
   rbrace:  '}',
   lbrack:  '[',
   rbrack:  ']',
-  conditional: ['==', '<', '>', '<=', '>='],
+  conditional: ['==', '!=', '<', '>', '<=', '>='],
   logical: ['&&', '||'],
   var_type: ['volatile', 'int', 'void', 'char', 'string'], 
   identifier: {match: /[a-zA-Z][a-zA-Z_0-9]*/, type:  moo.keywords({
@@ -164,25 +165,27 @@ fun_params
         %}
 
 fun_call
-    -> %identifier _ "(" arg_list ")" _ %EL
+    -> (%bang _):* %identifier _ "(" arg_list ")" _ %EL
         {%
             (data) => {
                 return {
                     type: "fun_call",
-                    fun_name: data[0],
-                    arguments: data[3]
+                    bang: data[0].map(b => b[0]),
+                    fun_name: data[1],
+                    arguments: data[4]
                 }
             }
         %}
 
 fun_call__           # Without the semi-colon, for use in conditional statements
-    -> %identifier _ "(" arg_list ")"
+    -> (%bang _):* %identifier _ "(" arg_list ")"
         {%
             (data) => {
                 return {
                     type: "fun_call__",
-                    fun_name: data[0],
-                    arguments: data[3]
+                    bang: data[0].map(b => b[0]),
+                    fun_name: data[1],
+                    arguments: data[4]
                 }
             }
         %}
@@ -223,10 +226,20 @@ condition
         {%
             (data) => {
                 return {
-                    type: "condition",
+                    type: "condition_check_logical",
                     control_keys: data[0].map(x => x[0]),
                     checks: [data[3], ...data[5].map(x => x[2])],
                     logicals: data[5].map(x => x[0]), 
+                };
+            }
+        %}
+    | (%control_key _):+ "(" _ %identifier _ ")" _ml "{"
+        {%
+            (data) => {
+                return {
+                    type: "condition_id",
+                    control_keys: data[0].map(x => x[0]),
+                    checks: data[3]
                 };
             }
         %}
@@ -265,7 +278,7 @@ loop
             (data) => {
                 return {
                     type: "loop", 
-                    loop_params: data[0], 
+                    loop_params: data[0],
                     body: data[1]
                 }
             } 
@@ -276,7 +289,7 @@ loop_params
         {%
             (data) => {
                 return {
-                    type: "loop_params", 
+                    type: "loop_params_stop", 
                     loop_key: data[0], 
                     counter_var: data[3], 
                     stop_condition: data[5], 
@@ -288,7 +301,17 @@ loop_params
         {%
             (data) => {
                 return {
-                    type: "loop_params", 
+                    type: "loop_params_check", 
+                    loop_key: data[0], 
+                    check: data[4],
+                }
+            }
+        %}
+    |  %loop_key _ "(" _ %identifier _ ")" _ml "{"    # Match while loop syntax
+        {%
+            (data) => {
+                return {
+                    type: "loop_params_id", 
                     loop_key: data[0], 
                     check: data[4],
                 }

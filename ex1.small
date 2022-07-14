@@ -1,29 +1,13 @@
-void Turn_right()
-{
- pinMode(A1, OUTPUT);
- pinMode(8, OUTPUT);
- pinMode(9, OUTPUT);
- pinMode(10, OUTPUT);
- digitalWrite(8, LOW);
- analogWrite(9, 153);
- digitalWrite(A1, HIGH);
- analogWrite(10, 153);
- delay(350);
- analogWrite(9, 0);
- analogWrite(10, 0);
-}
 
-void setup()
-{
-  pinMode(5, INPUT);
-}
 
 void loop()
 {
-  if (digitalRead(5) == 0)
-  {
-    
-    Turn_right();
 
-  }
+
+
+
+ if(false) {
+
+ }
+
 }

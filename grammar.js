@@ -11,6 +11,7 @@ const myLexer = moo.compile({           // NB: First things match first. The ord
   float:   /[-+]?[0-9]*\.[0-9]+/, 
   incrementor: ['++', '--'], 
   number:  /0|[1-9][0-9]*/,
+  bang: '!', 
   string:  /"(?:\\["\\]|[^\n"\\])*"/,
   char:    /'.'/,
   lparen:  '(',
@@ -19,7 +20,7 @@ const myLexer = moo.compile({           // NB: First things match first. The ord
   rbrace:  '}',
   lbrack:  '[',
   rbrack:  ']',
-  conditional: ['==', '<', '>', '<=', '>='],
+  conditional: ['==', '!=', '<', '>', '<=', '>='],
   logical: ['&&', '||'],
   var_type: ['volatile', 'int', 'void', 'char', 'string'], 
   identifier: {match: /[a-zA-Z][a-zA-Z_0-9]*/, type:  moo.keywords({
@@ -144,21 +145,29 @@ var grammar = {
             }
         }
                 },
-    {"name": "fun_call", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"("}, "arg_list", {"literal":")"}, "_", (myLexer.has("EL") ? {type: "EL"} : EL)], "postprocess": 
+    {"name": "fun_call$ebnf$1", "symbols": []},
+    {"name": "fun_call$ebnf$1$subexpression$1", "symbols": [(myLexer.has("bang") ? {type: "bang"} : bang), "_"]},
+    {"name": "fun_call$ebnf$1", "symbols": ["fun_call$ebnf$1", "fun_call$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "fun_call", "symbols": ["fun_call$ebnf$1", (myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"("}, "arg_list", {"literal":")"}, "_", (myLexer.has("EL") ? {type: "EL"} : EL)], "postprocess": 
         (data) => {
             return {
                 type: "fun_call",
-                fun_name: data[0],
-                arguments: data[3]
+                bang: data[0].map(b => b[0]),
+                fun_name: data[1],
+                arguments: data[4]
             }
         }
                 },
-    {"name": "fun_call__", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"("}, "arg_list", {"literal":")"}], "postprocess": 
+    {"name": "fun_call__$ebnf$1", "symbols": []},
+    {"name": "fun_call__$ebnf$1$subexpression$1", "symbols": [(myLexer.has("bang") ? {type: "bang"} : bang), "_"]},
+    {"name": "fun_call__$ebnf$1", "symbols": ["fun_call__$ebnf$1", "fun_call__$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "fun_call__", "symbols": ["fun_call__$ebnf$1", (myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":"("}, "arg_list", {"literal":")"}], "postprocess": 
         (data) => {
             return {
                 type: "fun_call__",
-                fun_name: data[0],
-                arguments: data[3]
+                bang: data[0].map(b => b[0]),
+                fun_name: data[1],
+                arguments: data[4]
             }
         }
                 },
@@ -194,10 +203,23 @@ var grammar = {
     {"name": "condition", "symbols": ["condition$ebnf$1", {"literal":"("}, "_", "check", "_", "condition$ebnf$2", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
         (data) => {
             return {
-                type: "condition",
+                type: "condition_check_logical",
                 control_keys: data[0].map(x => x[0]),
                 checks: [data[3], ...data[5].map(x => x[2])],
                 logicals: data[5].map(x => x[0]), 
+            };
+        }
+                },
+    {"name": "condition$ebnf$3$subexpression$1", "symbols": [(myLexer.has("control_key") ? {type: "control_key"} : control_key), "_"]},
+    {"name": "condition$ebnf$3", "symbols": ["condition$ebnf$3$subexpression$1"]},
+    {"name": "condition$ebnf$3$subexpression$2", "symbols": [(myLexer.has("control_key") ? {type: "control_key"} : control_key), "_"]},
+    {"name": "condition$ebnf$3", "symbols": ["condition$ebnf$3", "condition$ebnf$3$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "condition", "symbols": ["condition$ebnf$3", {"literal":"("}, "_", (myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+        (data) => {
+            return {
+                type: "condition_id",
+                control_keys: data[0].map(x => x[0]),
+                checks: data[3]
             };
         }
                 },
@@ -223,7 +245,7 @@ var grammar = {
         (data) => {
             return {
                 type: "loop", 
-                loop_params: data[0], 
+                loop_params: data[0],
                 body: data[1]
             }
         } 
@@ -231,7 +253,7 @@ var grammar = {
     {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "var_assign", "_", "stop_condition", "_", "incrementor", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
         (data) => {
             return {
-                type: "loop_params", 
+                type: "loop_params_stop", 
                 loop_key: data[0], 
                 counter_var: data[3], 
                 stop_condition: data[5], 
@@ -242,7 +264,16 @@ var grammar = {
     {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "_", "check", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
         (data) => {
             return {
-                type: "loop_params", 
+                type: "loop_params_check", 
+                loop_key: data[0], 
+                check: data[4],
+            }
+        }
+                },
+    {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "_", (myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+        (data) => {
+            return {
+                type: "loop_params_id", 
                 loop_key: data[0], 
                 check: data[4],
             }

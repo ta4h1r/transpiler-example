@@ -263,12 +263,13 @@ var grammar = {
             }
         }
                 },
-    {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "_", "check", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+    {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "_", "condition", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
         (data) => {
             return {
                 type: "loop_params_check", 
                 loop_key: data[0], 
-                check: data[4],
+                checks: [data[4], ...data[6].map(x => x[2])],
+                logicals: data[6].map(x => x[0]), 
             }
         }
                 },

@@ -5,11 +5,9 @@ void loop()
 
 
 
-
-   if (!digitalRead(12))
+  while (digitalRead(5) == 1 && digitalRead(4) == 0)
   {
-    forward(152);
-
+    Turn_left();
   }
 
 }

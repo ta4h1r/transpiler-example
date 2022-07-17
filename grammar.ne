@@ -7,6 +7,7 @@ const myLexer = moo.compile({           // NB: First things match first. The ord
   float:   /[-+]?[0-9]*\.[0-9]+/, 
   incrementor: ['++', '--'], 
   number:  /0|[1-9][0-9]*/,
+  conditional: ['==', '!=', '<', '>', '<=', '>='],
   bang: '!', 
   string:  /"(?:\\["\\]|[^\n"\\])*"/,
   char:    /'.'/,
@@ -16,12 +17,12 @@ const myLexer = moo.compile({           // NB: First things match first. The ord
   rbrace:  '}',
   lbrack:  '[',
   rbrack:  ']',
-  conditional: ['==', '!=', '<', '>', '<=', '>='],
   logical: ['&&', '||'],
-  var_type: ['volatile', 'int', 'void', 'char', 'string'], 
+  var_type: ['volatile', 'int', 'void', 'char', 'string', 'float'], 
   identifier: {match: /[a-zA-Z][a-zA-Z_0-9]*/, type:  moo.keywords({
     control_key: ['else', 'if'],
     loop_key: ['for', 'while'],
+    return_key: ['return']
   })},
   assign: '=',
   comma: ',', 
@@ -55,6 +56,20 @@ statement
     | control       {% id %}
     | loop          {% id %}
     | object_ref    {% id %}
+    | return           {% id %}
+
+return
+    -> %return_key __ expr
+        {%
+            (data) => {
+                return {
+                    type: "return_expr", 
+                    identifier: data[2],
+                }
+            }
+        
+        %}
+
 
 object_ref 
     -> %identifier %dot fun_call__
@@ -62,8 +77,8 @@ object_ref
             (data) => {
                 return {
                     type: "object_ref", 
-                    identifier: data[1],
-                    function: data[3], 
+                    identifier: data[0],
+                    function: data[2], 
                 }
             }
         
@@ -127,6 +142,18 @@ math
                     lhs: data[1],
                     operations: data[3].map(x => x[0]), 
                     rhs: data[3].map(x => x[2])
+                }
+            }
+        
+        %}
+        | fun_call__ _ (%operation _ expr):+ 
+        {%
+            (data) => {
+                return {
+                    type: "math", 
+                    lhs: data[1],
+                    operations: data[2].map(x => x[0]), 
+                    rhs: data[2].map(x => x[2])
                 }
             }
         
@@ -275,6 +302,15 @@ condition
                     type: "condition_expr",
                     control_keys: data[0].map(x => x[0]),
                     checks: data[3]
+                };
+            }
+        %}
+    | (%control_key):+ _ml "{"     # else {}
+        {%
+            (data) => {
+                return {
+                    type: "condition_else",
+                    control_keys: data[0].map(x => x[0]),
                 };
             }
         %}

@@ -1,5 +1,4 @@
 
-
 void loop()
 {
 
@@ -7,15 +6,12 @@ void loop()
 
 
 
+ if (checkdistance() <= 1)
+  {
 
-  if (Serial.available() > 0) {
+  } else {
 
   }
-
-  Serial.println("");
-  Serial.println("");
-
-  Serial.read();
 
 
 }

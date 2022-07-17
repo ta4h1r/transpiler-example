@@ -216,10 +216,10 @@ var grammar = {
     {"name": "condition$ebnf$3", "symbols": ["condition$ebnf$3$subexpression$1"]},
     {"name": "condition$ebnf$3$subexpression$2", "symbols": [(myLexer.has("control_key") ? {type: "control_key"} : control_key), "_"]},
     {"name": "condition$ebnf$3", "symbols": ["condition$ebnf$3", "condition$ebnf$3$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "condition", "symbols": ["condition$ebnf$3", {"literal":"("}, "_", (myLexer.has("identifier") ? {type: "identifier"} : identifier), "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+    {"name": "condition", "symbols": ["condition$ebnf$3", {"literal":"("}, "_", "expr", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
         (data) => {
             return {
-                type: "condition_id",
+                type: "condition_expr",
                 control_keys: data[0].map(x => x[0]),
                 checks: data[3]
             };

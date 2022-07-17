@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run gen-parser && node parse.js ex1.small && node generate.js ex1.ast", 
+    "start": "node parse.js ex1.small && node generate.js ex1.ast", 
     "gen-parser": "nearleyc grammar.ne -o grammar.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

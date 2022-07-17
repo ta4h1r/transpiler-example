@@ -6,6 +6,10 @@ void loop()
 
 
 
-   while(false){   }
+   if (!digitalRead(12))
+  {
+    forward(152);
+
+  }
 
 }

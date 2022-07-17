@@ -233,11 +233,11 @@ condition
                 };
             }
         %}
-    | (%control_key _):+ "(" _ %identifier _ ")" _ml "{"
+    | (%control_key _):+ "(" _ expr _ ")" _ml "{"
         {%
             (data) => {
                 return {
-                    type: "condition_id",
+                    type: "condition_expr",
                     control_keys: data[0].map(x => x[0]),
                     checks: data[3]
                 };

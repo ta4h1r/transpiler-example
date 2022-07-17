@@ -29,6 +29,7 @@ const myLexer = moo.compile({           // NB: First things match first. The ord
   })},
   assign: '=',
   comma: ',', 
+  dot: '.', 
   operation: ['+', '-', '/', '*'],
   EL: ';', 
   NL:      { match: /\n/, lineBreaks: true },
@@ -52,6 +53,17 @@ var grammar = {
     {"name": "statement", "symbols": ["fun_call"], "postprocess": id},
     {"name": "statement", "symbols": ["control"], "postprocess": id},
     {"name": "statement", "symbols": ["loop"], "postprocess": id},
+    {"name": "statement", "symbols": ["object_ref"], "postprocess": id},
+    {"name": "object_ref", "symbols": [(myLexer.has("identifier") ? {type: "identifier"} : identifier), (myLexer.has("dot") ? {type: "dot"} : dot), "fun_call__"], "postprocess": 
+        (data) => {
+            return {
+                type: "object_ref", 
+                identifier: data[1],
+                function: data[3], 
+            }
+        }
+                
+                },
     {"name": "var_declare$ebnf$1$subexpression$1", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type), "_"]},
     {"name": "var_declare$ebnf$1", "symbols": ["var_declare$ebnf$1$subexpression$1"]},
     {"name": "var_declare$ebnf$1$subexpression$2", "symbols": [(myLexer.has("var_type") ? {type: "var_type"} : var_type), "_"]},
@@ -94,6 +106,23 @@ var grammar = {
     {"name": "expr", "symbols": [(myLexer.has("number") ? {type: "number"} : number)], "postprocess": id},
     {"name": "expr", "symbols": ["identifiers"], "postprocess": id},
     {"name": "expr", "symbols": ["fun_call__"], "postprocess": id},
+    {"name": "expr", "symbols": ["math"], "postprocess": id},
+    {"name": "expr", "symbols": ["object_ref"], "postprocess": id},
+    {"name": "math$ebnf$1$subexpression$1", "symbols": [(myLexer.has("operation") ? {type: "operation"} : operation), "_", (myLexer.has("number") ? {type: "number"} : number)]},
+    {"name": "math$ebnf$1", "symbols": ["math$ebnf$1$subexpression$1"]},
+    {"name": "math$ebnf$1$subexpression$2", "symbols": [(myLexer.has("operation") ? {type: "operation"} : operation), "_", (myLexer.has("number") ? {type: "number"} : number)]},
+    {"name": "math$ebnf$1", "symbols": ["math$ebnf$1", "math$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "math", "symbols": ["_ml", (myLexer.has("number") ? {type: "number"} : number), "_", "math$ebnf$1"], "postprocess": 
+        (data) => {
+            return {
+                type: "math", 
+                lhs: data[1],
+                operations: data[3].map(x => x[0]), 
+                rhs: data[3].map(x => x[2])
+            }
+        }
+                
+                },
     {"name": "identifiers$ebnf$1", "symbols": []},
     {"name": "identifiers$ebnf$1$subexpression$1", "symbols": [(myLexer.has("lbrack") ? {type: "lbrack"} : lbrack), (myLexer.has("identifier") ? {type: "identifier"} : identifier), (myLexer.has("rbrack") ? {type: "rbrack"} : rbrack)]},
     {"name": "identifiers$ebnf$1", "symbols": ["identifiers$ebnf$1", "identifiers$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
@@ -263,7 +292,10 @@ var grammar = {
             }
         }
                 },
-    {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "_", "condition", "_", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
+    {"name": "loop_params$ebnf$1", "symbols": []},
+    {"name": "loop_params$ebnf$1$subexpression$1", "symbols": [(myLexer.has("logical") ? {type: "logical"} : logical), "_", "check", "_"]},
+    {"name": "loop_params$ebnf$1", "symbols": ["loop_params$ebnf$1", "loop_params$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "loop_params", "symbols": [(myLexer.has("loop_key") ? {type: "loop_key"} : loop_key), "_", {"literal":"("}, "_", "check", "_", "loop_params$ebnf$1", {"literal":")"}, "_ml", {"literal":"{"}], "postprocess": 
         (data) => {
             return {
                 type: "loop_params_check", 

@@ -25,6 +25,7 @@ const myLexer = moo.compile({           // NB: First things match first. The ord
   })},
   assign: '=',
   comma: ',', 
+  dot: '.', 
   operation: ['+', '-', '/', '*'],
   EL: ';', 
   NL:      { match: /\n/, lineBreaks: true },
@@ -53,6 +54,23 @@ statement
     | fun_call      {% id %}
     | control       {% id %}
     | loop          {% id %}
+    | object_ref    {% id %}
+
+object_ref 
+    -> %identifier %dot fun_call__
+        {%
+            (data) => {
+                return {
+                    type: "object_ref", 
+                    identifier: data[1],
+                    function: data[3], 
+                }
+            }
+        
+        %}
+      
+
+
 
 var_declare
     -> (%var_type _):+ %identifier _ %EL
@@ -96,6 +114,23 @@ expr
     |  %number     {% id %}
     |  identifiers {% id %}
     |  fun_call__  {% id %}
+    |  math        {% id %}
+    |  object_ref  {% id %}
+
+
+math 
+    -> _ml %number _ (%operation _ %number):+ 
+        {%
+            (data) => {
+                return {
+                    type: "math", 
+                    lhs: data[1],
+                    operations: data[3].map(x => x[0]), 
+                    rhs: data[3].map(x => x[2])
+                }
+            }
+        
+        %}
 
 identifiers 
     -> %identifier (%lbrack %identifier %rbrack):*

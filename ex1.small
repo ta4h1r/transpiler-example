@@ -5,9 +5,17 @@ void loop()
 
 
 
-  while (digitalRead(5) == 1 && digitalRead(4) == 0)
-  {
-    Turn_left();
+
+
+
+  if (Serial.available() > 0) {
+
   }
+
+  Serial.println("");
+  Serial.println("");
+
+  Serial.read();
+
 
 }
